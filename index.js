@@ -115,7 +115,9 @@ async function run(){
         const reviews = await review.toArray();
         res.send(reviews);
       });
+      
       //recive post data for review section
+
       app.post("/review", async (req, res) => {
         const review = req.body;
         const query = {
@@ -126,16 +128,12 @@ async function run(){
         };
         console.log(query);
 
-        // const alreadyExists = await reviewCollection.findOne(query);
-        // if (alreadyExists) {
-        //   return res.send({ success: false, query: alreadyExists });
-        // }
         const reviewResult = await reviewCollection.insertOne(review);
         return res.send({ success: true, reviewResult });
       });
 
       // cancel order  from dashboard
-      
+
       app.delete("/order/:id", async (req, res) => {
         const id = req.params.id;
         const query = { _id: ObjectId(id) };
