@@ -135,6 +135,7 @@ async function run(){
       });
 
       // cancel order  from dashboard
+      
       app.delete("/order/:id", async (req, res) => {
         const id = req.params.id;
         const query = { _id: ObjectId(id) };
@@ -143,6 +144,7 @@ async function run(){
       });
 
       // for updating user profile
+
       app.get("/userinfo", async (req, res) => {
         const userinfos = await userInfoCollection.find().toArray();
         res.send(userinfos);
