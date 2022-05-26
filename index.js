@@ -21,106 +21,121 @@ const client = new MongoClient(uri, {
 
 async function run(){
     try{
-        await client.connect();
-        const toolCollection = client.db("bigbros").collection('tool');
-        const orderCollection = client.db("bigbros").collection('order');
-        const reviewCollection = client.db("bigbros").collection('review');
-        const userInfoCollection = client.db("bigbros").collection('userinfo');
+      await client.connect();
+      const toolCollection = client.db("bigbros").collection("tool");
+      const orderCollection = client.db("bigbros").collection("order");
+      const reviewCollection = client.db("bigbros").collection("review");
+      const userInfoCollection = client.db("bigbros").collection("userinfo");
 
-        //get every item
-        app.get('/tool', async (req,res) => {
-            const query ={};
-            const cursor = toolCollection.find(query);
-            const tools = await cursor.toArray();
-            res.send(tools);   
-        })
+      //get every item
+      app.get("/tool", async (req, res) => {
+        const query = {};
+        const cursor = toolCollection.find(query);
+        const tools = await cursor.toArray();
+        res.send(tools);
+      });
 
-        //get item by using dynamic route
-        app.get("/tool/:id",async(req,res)=>{
-            const id = req.params.id;
-            const query = {_id:ObjectId(id)};
-            const tool = await toolCollection.findOne(query);
-            res.send(tool)
-        })
+      //get item by using dynamic route
+      app.get("/tool/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const tool = await toolCollection.findOne(query);
+        res.send(tool);
+      });
 
-        //post method for get item from client
-        app.post('/order' , async(req, res) => {
-            const order = req.body;
-            const query = {
-              name : order.name,
-              email : order.email,
-              address: order.address,
-              phone: order.phone,
-              availableQuantity: order.availableQuantity,
-              price : order.price , 
-            };
-            console.log(query);
+      //post method for get item from client
+      app.post("/order", async (req, res) => {
+        const order = req.body;
+        const query = {
+          name: order.name,
+          email: order.email,
+          address: order.address,
+          phone: order.phone,
+          availableQuantity: order.availableQuantity,
+          price: order.price,
+        };
+        console.log(query);
 
-            const exists = await orderCollection.findOne(query);
-            if(exists) {
-                return res.send({success : false, order : exists });
-            }
-            const result = await orderCollection.insertOne(order);
-            return res.send({success: true , result})
-        } )
+        const exists = await orderCollection.findOne(query);
+        if (exists) {
+          return res.send({ success: false, order: exists });
+        }
+        const result = await orderCollection.insertOne(order);
+        return res.send({ success: true, result });
+      });
 
-        // get data from post method and show to dashboard
-        app.get('/order' , async(req , res) => {
-            const orders = await orderCollection.find().toArray();
-            res.send(orders)
-        })
+      // get data from post method and show to dashboard
+      app.get("/order", async (req, res) => {
+        const orders = await orderCollection.find().toArray();
+        res.send(orders);
+      });
+      app.get("/order/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const orders = await orderCollection.findOne(query);
+        res.send(orders);
+      });
 
-        // get review data from mongodb
-        app.get('/review', async(req,res) =>{
-            const query = {};
-            const review = reviewCollection.find(query);
-            const reviews = await review.toArray();
-            res.send(reviews);
-        })
-        //recive post data for review section
-        app.post('/review', async(req , res) =>{
-            const review = req.body;
-             const query = {
-               name: review.name,
-               description: review.description,
-               ratings: review.ratings,
-               img: review.img,
-             };
-             console.log(query);
+      // get review data from mongodb
+      app.get("/review", async (req, res) => {
+        const query = {};
+        const review = reviewCollection.find(query);
+        const reviews = await review.toArray();
+        res.send(reviews);
+      });
+      //recive post data for review section
+      app.post("/review", async (req, res) => {
+        const review = req.body;
+        const query = {
+          name: review.name,
+          description: review.description,
+          ratings: review.ratings,
+          img: review.img,
+        };
+        console.log(query);
 
-            // const alreadyExists = await reviewCollection.findOne(query);
-            // if (alreadyExists) {
-            //   return res.send({ success: false, query: alreadyExists });
-            // }
-            const reviewResult = await reviewCollection.insertOne(review);
-            return res.send({ success: true, reviewResult });
-        })
+        // const alreadyExists = await reviewCollection.findOne(query);
+        // if (alreadyExists) {
+        //   return res.send({ success: false, query: alreadyExists });
+        // }
+        const reviewResult = await reviewCollection.insertOne(review);
+        return res.send({ success: true, reviewResult });
+      });
 
-      
-        // for updating user profile
-        app.get('/userinfo' , async (req ,res) =>{
-            const userinfos = await userInfoCollection.find().toArray();
-            res.send(userinfos);
-        })
-        app.get('/userinfo/:id' , async (req ,res) =>{
-            const userinfos = await userInfoCollection.find().toArray();
-            res.send(userinfos);
-        })
+      // cancel order  from dashboard
+      app.delete("/order/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const deleteResult = await orderCollection.deleteOne(query);
+        res.send(deleteResult);
+      });
 
-        app.put("/userinfo" ,async(req , res) => {
-            const id = req.params.id ;
-            const userinfo = req.body ;
-            const filter = { id : id } ;
-            const options = { upsert : true } ;
-            const updateDoc = {
-                $set : userinfo ,
-            } ;
-            const result = await userInfoCollection.updateOne(filter , updateDoc , options);
-            res.send(result)
-        });
-        //code completed for updating profile
+      // for updating user profile
+      app.get("/userinfo", async (req, res) => {
+        const userinfos = await userInfoCollection.find().toArray();
+        res.send(userinfos);
+      });
+      app.get("/userinfo/:id", async (req, res) => {
+        const userinfos = await userInfoCollection.find().toArray();
+        res.send(userinfos);
+      });
 
-
+      app.put("/userinfo", async (req, res) => {
+        const id = req.params.id;
+        const userinfo = req.body;
+        const filter = { id: id };
+        const options = { upsert: true };
+        const updateDoc = {
+          $set: userinfo,
+        };
+        const result = await userInfoCollection.updateOne(
+          filter,
+          updateDoc,
+          options
+        );
+        res.send(result);
+      });
+      //code completed for updating profile
     }
     finally{
 
