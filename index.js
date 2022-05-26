@@ -30,6 +30,7 @@ async function run(){
       const userCollection = client.db("bigbros").collection("users");
 
       //get every item
+      
       app.get("/tool", async (req, res) => {
         const query = {};
         const cursor = toolCollection.find(query);
@@ -38,6 +39,7 @@ async function run(){
       });
 
       //get item by using dynamic route
+
       app.get("/tool/:id", async (req, res) => {
         const id = req.params.id;
         const query = { _id: ObjectId(id) };
@@ -46,6 +48,7 @@ async function run(){
       });
 
       //for adding a new product by admin
+
       app.post('/tool',async(req,res)=>{
           const newTool = req.body;
           const newResult = await toolCollection.insertOne(newTool);
@@ -53,6 +56,7 @@ async function run(){
       }) 
 
       //put mehod for getting all users
+
       app.put('/user/:email',async(req , res) => {
           const email = req.params.email ;
           const user = req.body ;
@@ -68,6 +72,7 @@ async function run(){
       });
 
       //to get all user
+
       app.get('/user',async(req,res) => {
            const query = {};
            const allUser = userCollection.find(query);
@@ -76,6 +81,7 @@ async function run(){
       })
 
       //post method for get item from client
+
       app.post("/order", async (req, res) => {
         const order = req.body;
         const query = {
@@ -97,7 +103,7 @@ async function run(){
       });
 
       // get data from post method and show to dashboard
-      
+
       app.get("/order", async (req, res) => {
         const orders = await orderCollection.find().toArray();
         res.send(orders);
