@@ -97,10 +97,13 @@ async function run(){
       });
 
       // get data from post method and show to dashboard
+      
       app.get("/order", async (req, res) => {
         const orders = await orderCollection.find().toArray();
         res.send(orders);
       });
+
+      // get data based on their id
       app.get("/order/:id", async (req, res) => {
         const id = req.params.id;
         const query = { _id: ObjectId(id) };
@@ -109,13 +112,14 @@ async function run(){
       });
 
       // get review data from mongodb
+
       app.get("/review", async (req, res) => {
         const query = {};
         const review = reviewCollection.find(query);
         const reviews = await review.toArray();
         res.send(reviews);
       });
-      
+
       //recive post data for review section
 
       app.post("/review", async (req, res) => {
