@@ -26,6 +26,7 @@ async function run(){
       const orderCollection = client.db("bigbros").collection("order");
       const reviewCollection = client.db("bigbros").collection("review");
       const userInfoCollection = client.db("bigbros").collection("userinfo");
+      const userCollection = client.db("bigbros").collection("users");
 
       //get every item
       app.get("/tool", async (req, res) => {
@@ -42,6 +43,27 @@ async function run(){
         const tool = await toolCollection.findOne(query);
         res.send(tool);
       });
+
+      //for adding a new product by admin
+      app.post('/tool',async(req,res)=>{
+          const newTool = req.body;
+          const newResult = await toolCollection.insertOne(newTool);
+          return res.send({ success : true , newResult }) ;
+      }) 
+
+      //put mehod for getting all users
+      app.put('/user/:email',async(req , res) => {
+          const email = req.params.email ;
+          const user = req.body ;
+          const filter = { email : email } ;
+          const options = { upsert: true } ;
+          const updateDoc = {
+            $set: user,
+          };
+          const userResult = await userCollection.updateOne(filter , updateDoc , options) ;
+          res.send(userResult);
+
+      })
 
       //post method for get item from client
       app.post("/order", async (req, res) => {
