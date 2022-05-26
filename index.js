@@ -25,6 +25,7 @@ async function run(){
         const toolCollection = client.db("bigbros").collection('tool');
         const orderCollection = client.db("bigbros").collection('order');
         const reviewCollection = client.db("bigbros").collection('review');
+        const userInfoCollection = client.db("bigbros").collection('userinfo');
 
         //get every item
         app.get('/tool', async (req,res) => {
@@ -94,6 +95,32 @@ async function run(){
             const reviewResult = await reviewCollection.insertOne(review);
             return res.send({ success: true, reviewResult });
         })
+
+      
+        // for updating user profile
+        app.get('/userinfo' , async (req ,res) =>{
+            const userinfos = await userInfoCollection.find().toArray();
+            res.send(userinfos);
+        })
+        app.get('/userinfo/:id' , async (req ,res) =>{
+            const userinfos = await userInfoCollection.find().toArray();
+            res.send(userinfos);
+        })
+
+        app.put("/userinfo" ,async(req , res) => {
+            const id = req.params.id ;
+            const userinfo = req.body ;
+            const filter = { id : id } ;
+            const options = { upsert : true } ;
+            const updateDoc = {
+                $set : userinfo ,
+            } ;
+            const result = await userInfoCollection.updateOne(filter , updateDoc , options);
+            res.send(result)
+        });
+        //code completed for updating profile
+
+
     }
     finally{
 
