@@ -19,6 +19,23 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+//for verifying jwt create a function
+
+// function verifyJWT(req, res, next) {
+//   const authHeader = req.headers.authorization;
+//   if (!authHeader) {
+//     return res.status(401).send({ message: "UnAuthorized access" });
+//   }
+//   const token = authHeader.split(" ")[1];
+//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+//     if (err) {
+//       return res.status(403).send({ message: "Forbidden access" });
+//     }
+//     req.decoded = decoded;
+//     next();
+//   });
+// }
+
 
 async function run(){
     try{
@@ -70,6 +87,18 @@ async function run(){
           res.send({userResult , token });
 
       });
+
+      //gflkjfgjfklgflgkj
+      //dslkfjlskdfjdl
+      //fidfjdlskfjfskj
+
+      //sdjhfdsahfhdfhdfsj
+      // app.get("/order" , async(req,res) => {
+      //   const email = req.params.email ;
+      //   const query = { email : email }; 
+      //   const orders = await orderCollection.find(query).toArray();
+      //   res.send(orders);
+      // });
 
       //to get all user
 
