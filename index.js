@@ -21,20 +21,20 @@ const client = new MongoClient(uri, {
 
 //for verifying jwt create a function
 
-// function verifyJWT(req, res, next) {
-//   const authHeader = req.headers.authorization;
-//   if (!authHeader) {
-//     return res.status(401).send({ message: "UnAuthorized access" });
-//   }
-//   const token = authHeader.split(" ")[1];
-//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
-//     if (err) {
-//       return res.status(403).send({ message: "Forbidden access" });
-//     }
-//     req.decoded = decoded;
-//     next();
-//   });
-// }
+function verifyJWT(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send({ message: "UnAuthorized access" });
+  }
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+    if (err) {
+      return res.status(403).send({ message: "Forbidden access" });
+    }
+    req.decoded = decoded;
+    next();
+  });
+}
 
 
 async function run(){
@@ -72,6 +72,15 @@ async function run(){
           return res.send({ success : true , newResult }) ;
       }) 
 
+      // delete item as an admin from the database
+
+       app.delete("/tool/:id", async (req, res) => {
+         const id = req.params.id;
+         const query = { _id: ObjectId(id) };
+         const deleteResult = await toolCollection.deleteOne(query);
+         res.send(deleteResult);
+       });
+
       //put mehod for getting all users
 
       app.put('/user/:email',async(req , res) => {
@@ -89,8 +98,7 @@ async function run(){
       });
 
       //gflkjfgjfklgflgkj
-      //dslkfjlskdfjdl
-      //fidfjdlskfjfskj
+    
 
       //sdjhfdsahfhdfhdfsj
       // app.get("/order" , async(req,res) => {
@@ -217,14 +225,25 @@ async function run(){
             res.send({ admin: isAdmin })
         })
 
-        app.put('/user/admin/:email', async (req, res) => {
+        app.put('/user/admin/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
-            const filter = { email: email };
-            const updateDoc = {
-                $set: { role: 'admin' },
-            };
-            const result = await userCollection.updateOne(filter, updateDoc);
-            res.send(result);
+            // for admin
+            const requester = req.decoded.email;
+            const requesterAccount = await userCollection.findOne({email : requester});
+            if(requesterAccount.role === 'admin'){
+                 const filter = { email: email };
+                 const updateDoc = {
+                   $set: { role: "admin" },
+                 };
+                 const result = await userCollection.updateOne(
+                   filter,
+                   updateDoc
+                 );
+                 res.send(result);
+            }
+            else{
+              res.status(403).send({message : 'forbidden access'})
+            }
         })
 
 
